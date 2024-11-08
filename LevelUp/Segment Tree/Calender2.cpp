@@ -7,7 +7,6 @@ class Node{
         int t;
         Node *left;
         Node *right;
-
         Node(int s, int t){
             this->s = s;
             this->t = t;
