@@ -1,67 +1,55 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-class Solution {
-public:
-    vector<string> fullJustify(vector<string>& words, int maxWidth) {
-        int n = words.size();
-        int width = 0;
-        string s;
-        int count = 0;
-        int extraSpace;
-        vector<string> ans;
-        int spaceLen;
-        for(int i = 0; i < n;){
-            width = 0;
-            count = 0;
-            s = "";
-            vector<int> line;
-            while((width + words[i].size()) <= maxWidth){
-                width += words[i].size() + 1;
-                line.push_back(i);
-                i++;
-            }
-            int ls = line.size();
-            width -= ls;
-            if(i == n){
-                for(int j = 0; j < ls; j++){
-                    s += words[line[j]];
-                    s += " "; 
-                }
-                if(s.size() > maxWidth){
-                    s.pop_back();
-                }
-                while(s.size() != maxWidth){
-                    s += " ";
-                }
+vector<int> getKmp(string s){
+    int n = s.size();
+    vector<int> check;
+    check.push_back(0);
+    int j = 0;
+    for(int i = 0; i < n; i++){
+        while(1){
+            if(s[i] == s[j]){
+                check.push_back(++j);
+                break;
             }else{
-                spaceLen = maxWidth - width;
-                extraSpace = (ls == 1 ? 0 : spaceLen % (ls - 1));
-                for(int j = 0; j < ls; j++){
-                    int space =  ls == 1 ? spaceLen : spaceLen / (ls - 1);
-                    if(extraSpace > 0){
-                        space += 1;
-                        extraSpace -= 1;
-                    }
-                    s += words[line[j]];
-                    while(space > 0 && (j != (ls - 1) || ls == 1)){
-                        s += " ";
-                        space -= 1;
-                    }
+                if(j == 0){
+                    break;
                 }
+                j = check[j-1];
             }
-            ans.push_back(s);
         }
-        return ans;
     }
-};
+    return check;
+}
+
+int getAns(string s1, string s2){
+    int n = s1.size();
+    int m = s2.size();
+    vector<int> check;
+    check = getKmp(s2);
+    int j = 0;
+    for(int i = 0; i < n; i++){
+        while(1){
+            if(s1[i] == s2[j]){
+                j++;
+                break;
+            }else{
+                if(j == 0){
+                    break;
+                }
+                j = check[j-1];
+            }
+        }
+        if(j == m){
+            return i - j + 1;
+        }
+    }
+    return -1;
+}
 
 int main(){
-    vector<string> words{"a"};
-    Solution s;
-    words = s.fullJustify(words,1);
-    for(auto c : words){
-        cout << c << endl;
-    }
+    string s1 = "abcabcdabc";
+    string s2 = "abcdabc";
+    cout << getAns(s1,s2) << endl;
     return 0;
 }
