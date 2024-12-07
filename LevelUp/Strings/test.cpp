@@ -1,55 +1,41 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<int> getKmp(string s){
-    int n = s.size();
-    vector<int> check;
-    check.push_back(0);
-    int j = 0;
-    for(int i = 0; i < n; i++){
-        while(1){
-            if(s[i] == s[j]){
-                check.push_back(++j);
-                break;
-            }else{
-                if(j == 0){
-                    break;
-                }
-                j = check[j-1];
-            }
+unordered_map<string,bool> mp;
+    
+bool checkPal(string str){
+    if(mp.find(str) != mp.end()){
+        return mp[str];
+    }
+    int n = str.size();
+    for(int i = 0; i < n/2; i++){
+        if(str[i] != str[n-i-1]){
+            return mp[str] = false;
         }
     }
-    return check;
+    return mp[str] = true;
 }
 
-int getAns(string s1, string s2){
-    int n = s1.size();
-    int m = s2.size();
-    vector<int> check;
-    check = getKmp(s2);
-    int j = 0;
+int minChar(string& s) {
+    // Write your code here
+    int n = s.size();
+    int ans = n-1;
+    string lft = "";
     for(int i = 0; i < n; i++){
-        while(1){
-            if(s1[i] == s2[j]){
-                j++;
-                break;
-            }else{
-                if(j == 0){
-                    break;
-                }
-                j = check[j-1];
-            }
+        lft += s[0];
+        s = s.substr(1);
+        if(checkPal(lft)){
+            ans = min(ans,n - i + 1);
         }
-        if(j == m){
-            return i - j + 1;
+        if(checkPal(s)){
+            ans = min(ans,i+1);
         }
     }
-    return -1;
+    return ans;
 }
 
 int main(){
-    string s1 = "abcabcdabc";
-    string s2 = "abcdabc";
-    cout << getAns(s1,s2) << endl;
+    string a = "abc";
+    cout << minChar(a) << endl;
     return 0;
 }

@@ -5,11 +5,9 @@ class Node{
     public:
         char data;
         unordered_map<char,Node*> mp;
-        bool isTerminal;
-
+        vector<int> term;
         Node(char c){
             data = c;
-            isTerminal = false;
         }
 };
 
@@ -21,69 +19,71 @@ class Trie{
             root = new Node('\0');
         }
 
-        void insert(string word){
+        void insert(string word, int idx){
             Node *temp = root;
-            for(int i = 0; i < word.size(); i++){
-                if(temp->mp.count(word[i]) == 0){
-                    Node *n = new Node(word[i]);
-                    temp->mp[word[i]] = n;
+            int n = word.size();
+            for(int i = n - 1; i >= 0; i--){
+                if(temp->mp.find(word[i]) == temp->mp.end()){
+                    Node *nw = new Node(word[i]);
+                    temp->mp[word[i]] = nw;
                 }
                 temp = temp->mp[word[i]];
             }
-            temp->isTerminal = true;
+            temp->term.push_back(idx);
         }
 
-        bool search(string word){
-            Node *temp = root;
-            for(int i = 0; i < word.size(); i++){
-                if(temp->mp.count(word[i]) == 0){
+        bool checkPalindrome(string s){
+            int n = s.size();
+            for(int i = 0; i < n/2; i++){
+                if(s[i] != s[n - i - 1]){
                     return false;
                 }
-                temp = temp->mp[word[i]];
-            }
-            if(!temp->isTerminal){
-                return false;
             }
             return true;
+        }
+
+        void searchPairs(string s, vector<vector<int>> &check, int idx){
+            int n = s.size();
+            Node *temp = root;
+            for(int i = 0; i < n; i++){
+                if(temp->term.size() != 0 && checkPalindrome(s.substr(i+1))){
+                    for(auto ac : temp->term){
+                        if(idx != ac){
+                            check.push_back({idx,ac});
+                        }
+                    }
+                }
+                if(temp->mp.find(s[i]) == temp->mp.end()){
+                    break;
+                }
+                temp = temp->mp[s[i]];
+            }
+            
         }
 };
 
 class Solution {
 public:
-    void getAns(string s, int idx, Trie t, string sum, string ans, vector<string> &v){
-        if(idx == s.size()){
-            if(sum == "" && ans.size() != 0){
-                ans = ans.substr(0,ans.size()-1);
-                v.push_back(ans);
-            }
-            return;
-        }
-        sum += s[idx];
-        if(t.search(sum)){
-            getAns(s,idx+1,t,"",ans + sum + " ", v);
-        }
-        getAns(s,idx+1,t,sum,ans,v);
-    }
-
-    vector<string> wordBreak(string s, vector<string>& wordDict) {
+    vector<vector<int>> palindromePairs(vector<string>& words) {
         Trie t;
-        vector<string> v;
-        for(auto c : wordDict){
-            t.insert(c);
+        int n = words.size();
+        for(int i = 0; i < n; i++){
+            t.insert(words[i],i);
         }
-        getAns(s,0,t,"","",v);
-        return v;
+        vector<vector<int>> check;
+        for(int i = 0; i < n; i++){
+            t.searchPairs(words[i],check,i);
+        }
+        for(auto c : check){
+            cout << c[0] << " " << c[1] << endl;
+        }
+        return check;
     }
 };
 
 int main(){
-    string str = "catsanddog";
-    vector<string> dict{"cat","cats","and","sand","dog"};
+    vector<string> words{"a","add", "a"};
     Solution s;
-    vector<string> v;
-    v = s.wordBreak(str,dict);
-    for(auto x : v){
-        cout << x << endl;
-    }
+    s.palindromePairs(words);
     return 0;
 }
