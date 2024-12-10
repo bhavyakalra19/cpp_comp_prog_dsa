@@ -1,30 +1,35 @@
+// https://leetcode.com/problems/climbing-stairs/description/
+
 #include<bits/stdc++.h>
 using namespace std;
 
-int getAns(int num, vector<int> &dp){
-    if(num <= 1){
-        return 1;
-    }
-    if(dp[num] != -1){
-        return dp[num];
-    }
-    return dp[num] = getAns(num-1,dp) + getAns(num-2,dp);
-}
+class Solution {
+public:
+    // int getAns(int n){
+    //     if(n <= 1){
+    //         return 1;
+    //     }
+    //     int a = getAns(n-1);
+    //     int b = getAns(n-2);
+    //     return a + b;
+    // }
 
-int getWays(int num){
-    vector<int> dp(num+1, -1);
-    
-    // return getAns(num, dp);
-
-    dp[0] = 1;
-    dp[1] = 1;
-    for(int i = 2; i <= num; i++){
-        dp[i] = dp[i-1] + dp[i-2];
+    int climbStairs(int n) {
+        // vector<int> dp(n+1, 1);
+        int prev1 = 1;
+        int prev2 = 1;
+        int curr = 1;
+        for(int i = 2; i <= n; i++){
+            curr = prev1 + prev2;
+            prev2 = prev1;
+            prev1 = curr;
+        }
+        return curr;
     }
-    return dp[num];
-}
+};
 
 int main(){
-    cout << getWays(3) << endl;
+    Solution s;
+    cout << s.climbStairs(4) << endl;
     return 0;
 }
